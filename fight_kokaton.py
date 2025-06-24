@@ -219,8 +219,10 @@ def main():
                     del beams[i]  # 特定のビームをリストから削除する
                 else:
                     beam.update(screen)  # ビームを描画する 
+
         for bomb in bombs: 
             bomb.update(screen)
+            
         score.update(screen) # スコアを描画
         pg.display.update()
         tmr += 1
