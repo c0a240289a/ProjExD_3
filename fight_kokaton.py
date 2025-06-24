@@ -151,6 +151,7 @@ def main():
     for _ in range(NUM_OF_BOMB):
         bombs.append(Bomb((255,0,0),10))
     beam = None  # ゲーム初期化時にはビームは存在しない
+    beams =  [] #ビーム用の空のリスト
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -159,11 +160,11 @@ def main():
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                beams.append(Beam(bird)) #Beamクラスのインスタンスをリストに追加           
         screen.blit(bg_img, [0, 0])
 
         # if bomb is not None:
-        for bomb in bombs: #核爆弾との衝突判定
+        for bomb in bombs: #各爆弾との衝突判定
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
@@ -176,18 +177,26 @@ def main():
         
         # if bomb is not None:
         for i,bomb in enumerate(bombs):
-            if beam is not None:
+            for j,beam in enumerate(beams):
+                #if beam is not None:
                 if beam.rct.colliderect(bomb.rct): #ビームと爆弾が衝突していたら
-                    beam = None
+                    beams[j] = None
                     bombs[i] = None
                     bird.change_img(6, screen)
-        bombs = [bomb for bomb in bombs if bomb is not None]            
+            beams = [beam for beam in beams if beam is not None]        
+        bombs = [bomb for bomb in bombs if bomb is not None]
+        
 
+       
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        if beam is not None: #ビームが存在するときだけ
-            beam.update(screen)  
+        if beam is not None:  # ビームが存在するときだけ
+            for i,beam in enumerate(beams):
+                if check_bound(beam.rct) != (True,True):  # 画面内にビームが存在しないなら
+                    del beams[i]  # 特定のビームをリストから削除する
+                else:
+                    beam.update(screen)  # ビームを描画する
         for bomb in bombs: 
             bomb.update(screen)
         pg.display.update()
